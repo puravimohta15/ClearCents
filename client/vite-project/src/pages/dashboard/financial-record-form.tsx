@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select"
 
 import { useState } from "react"
+import { useFinancialRecords } from "@/contexts/financial-records-context"
 
 
 const formSchema = z.object({
@@ -38,6 +39,7 @@ export const FinancialRecordForm = () => {
     // const [amount, setAmount] = useState<number>(0);
     // const [category, setCategory] = useState<string>("");   
     // const [paymentMethod, setPaymentMethod] = useState<string>("");
+    const {addRecord} = useFinancialRecords();
     const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,14 +52,14 @@ export const FinancialRecordForm = () => {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const newRecord = {
-        userId : user?.id,
-        date : new Date().toISOString(),
+        userId : user?.id ?? "",
+        date : new Date(),
         amount: values.amount,
         category: values.category,  
         description: values.description,  
         paymentMethod: values.paymentMethod,
     }
-    //addRecord(newRecord)
+    addRecord(newRecord)
     console.log("Form Submitted", values)
     form.reset({
         description: "",
