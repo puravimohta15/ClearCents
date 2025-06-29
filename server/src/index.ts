@@ -1,4 +1,4 @@
-//PW: n1s6QMjIo7AxJs0q
+
 import express, {Express} from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -8,7 +8,7 @@ dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
-const MONGO_URI: string = process.env.MONGO_URI || 'mongodb+srv://puravimohta5:n1s6QMjIo7AxJs0q@clearcents.zmgctmi.mongodb.net/';
+const MONGO_URI: string = process.env.MONGO_URI || 'mongodb+srv://username:password@clearcents.zmgctmi.mongodb.net/';
 
 app.use(express.json());
 app.use(cors()); // Enable CORS for all routes
