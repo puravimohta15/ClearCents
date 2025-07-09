@@ -10,9 +10,86 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table"
-import { useMemo } from "react"
-import { EditableCell } from "./editable-cell"
+import { useMemo, useState } from "react"
 import { useFinancialRecords } from "@/contexts/financial-records-context"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+const EditableCell = ({ getValue, row, column, table }: any) => {
+  const initialValue = getValue()
+  const [value, setValue] = useState(initialValue)
+  const [isEditing, setIsEditing] = useState(false)
+
+  const onBlur = () => {
+    setIsEditing(false)
+    table.options.meta?.updateData(row.index, column.id, value)
+  }
+
+  return isEditing ? (
+    <input
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      autoFocus
+      onBlur={onBlur}
+      className="w-full border px-2 py-1 rounded"
+    />
+  ) : (
+    <div onClick={() => setIsEditing(true)} className="cursor-pointer">
+      {value}
+    </div>
+  )
+}
+
+const CategoryDropdown = ({ getValue, row, column, table }: any) => {
+  const value = getValue()
+  return (
+    <Select
+      value={value}
+      onValueChange={(val) => {
+        table.options.meta?.updateData(row.index, column.id, val)
+      }}
+    >
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select category" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="Rent">Rent</SelectItem>
+        <SelectItem value="Food">Food</SelectItem>
+        <SelectItem value="Salary">Salary</SelectItem>
+        <SelectItem value="Utilities">Utilities</SelectItem>
+        <SelectItem value="Entertainment">Entertainment</SelectItem>
+        <SelectItem value="Travel">Travel</SelectItem>
+        <SelectItem value="Others">Others</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
+
+const PaymentMethodDropdown = ({ getValue, row, column, table }: any) => {
+  const value = getValue()
+  return (
+    <Select
+      value={value}
+      onValueChange={(val) => {
+        table.options.meta?.updateData(row.index, column.id, val)
+      }}
+    >
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select payment method" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="credit">Credit/Debit Card</SelectItem>
+        <SelectItem value="upi">UPI</SelectItem>
+        <SelectItem value="cash">Cash</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
 
 export const FinancialRecordList = () => {
   const { records, updateRecord, deleteRecord } = useFinancialRecords()
@@ -32,12 +109,12 @@ export const FinancialRecordList = () => {
       {
         header: "Category",
         accessorKey: "category",
-        cell: EditableCell,
+        cell: CategoryDropdown,
       },
       {
         header: "Payment Method",
         accessorKey: "paymentMethod",
-        cell: EditableCell,
+        cell: PaymentMethodDropdown,
       },
       {
         header: "Date",
@@ -66,14 +143,7 @@ export const FinancialRecordList = () => {
     meta: {
       updateData: (rowIndex: number, columnId: string, value: any) => {
         const row = records[rowIndex]
-        if (!row || !row._id){
-            console.log(row, row._id)
-            console.error("Row or row ID is undefined", row, rowIndex, columnId, value)
-            return
-        }
-        if(columnId === "Payment Method" && value != "UPI" || value != "Debit/Credit Card" || value != "Cash") {
-          console.error("Invalid payment method value:", value)
-          return}
+        if (!row || !row._id) return
         updateRecord(row._id, { ...row, [columnId]: value })
       },
     },
@@ -87,7 +157,7 @@ export const FinancialRecordList = () => {
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead className="text-left" key={header.id}>
+                <TableHead key={header.id}>
                   {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               ))}
@@ -96,7 +166,7 @@ export const FinancialRecordList = () => {
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <TableRow className="text-left" key={row.id}>
+            <TableRow key={row.id}>
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

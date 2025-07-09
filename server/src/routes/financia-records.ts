@@ -1,8 +1,10 @@
 import express, { Request, Response } from "express";
 import FinancialRecordModel from '../schema/financial-record';
+import Budget from "../schema/Budget";
 
 const router: express.Router = express.Router();
 
+// Financial Record Routes
 router.get("/getAllByUserId/:userId", async(req: Request<{ userId: string }>,res: Response) => {
     try {
         const userId = req.params.userId;
@@ -57,4 +59,22 @@ router.delete("/:userId", async (req: Request<{ userId: string }>, res: Response
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+
+router.get("/:userId/:month", async (req, res) => {
+  const { userId, month } = req.params;
+  const budget = await Budget.findOne({ userId, month });
+  res.json(budget);
+});
+
+router.post("/", async (req, res) => {
+  const { userId, month, amount } = req.body;
+  let budget = await Budget.findOneAndUpdate(
+    { userId, month },
+    { amount },
+    { new: true, upsert: true }
+  );
+  res.json(budget);
+});
+
 export default router;

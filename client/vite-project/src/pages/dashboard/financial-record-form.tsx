@@ -70,9 +70,6 @@ export const FinancialRecordForm = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="w-150 bg-white items-center justify-center rounded-2xl shadow-xl p-8 border">
-        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">Add Financial Record</h2>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -125,6 +122,7 @@ export const FinancialRecordForm = () => {
                       <SelectItem value="Salary">Salary</SelectItem>
                       <SelectItem value="Utilities">Utilities</SelectItem>
                       <SelectItem value="Entertainment">Entertainment</SelectItem>
+                      <SelectItem value="Travel">Travel</SelectItem>
                       <SelectItem value="Others">Others</SelectItem>
                     </SelectContent>
                   </Select>
@@ -160,7 +158,6 @@ export const FinancialRecordForm = () => {
             <Button type="submit" className="w-full">Submit</Button>
           </form>
         </Form>
-      </div>
-    </div>
+
   )
 }

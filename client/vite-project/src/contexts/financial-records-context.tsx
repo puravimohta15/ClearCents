@@ -22,6 +22,7 @@ export const FinancialRecordsProvider = ({children}: {children: React.ReactNode}
     const [records, setRecords] = useState<FinancialRecord[]>([]);
     const {user} = useUser();
     const fetchRecords = async () => {
+      if(!user || !user.id) return;
         try {
             const response = await fetch(`http://localhost:3000/financial-records/getAllByUserId/${user?.id}`);
             if (response.ok) {
@@ -50,11 +51,16 @@ export const FinancialRecordsProvider = ({children}: {children: React.ReactNode}
         }
     };
     const updateRecord = async (id: string, updatedRecord: Partial<FinancialRecord>) => {
+
+        const original = records.find(r => r._id === id);
+        if (!original) return;
+        const fullRecord = { ...original, ...updatedRecord };
+    
         const response = await fetch(
           `http://localhost:3000/financial-records/${id}`,
           {
             method: "PUT",
-            body: JSON.stringify(updatedRecord),
+            body: JSON.stringify(fullRecord),
             headers: {
               "Content-Type": "application/json",
             },
@@ -81,6 +87,7 @@ export const FinancialRecordsProvider = ({children}: {children: React.ReactNode}
         }
       };
       const deleteRecord = async (id: string) => {
+        // if(!user || !user.id) return;
         const response = await fetch(
           `http://localhost:3000/financial-records/${id}`,
           {
