@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table"
 import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
-import { useFinancialRecords } from "@/contexts/financial-records-context"
+import { useFinancialRecords, type FinancialRecord } from "@/contexts/financial-records-context"
 import {
   Select,
   SelectContent,
@@ -19,6 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+interface FinancialRecordListProps {
+  records?: FinancialRecord[]; 
+}
 
 const EditableCell = ({ getValue, row, column, table }: any) => {
   const initialValue = getValue()
@@ -83,16 +87,18 @@ const PaymentMethodDropdown = ({ getValue, row, column, table }: any) => {
         <SelectValue placeholder="Select payment method" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="credit">Credit/Debit Card</SelectItem>
-        <SelectItem value="upi">UPI</SelectItem>
-        <SelectItem value="cash">Cash</SelectItem>
+        <SelectItem value="UPI">UPI</SelectItem>
+        <SelectItem value="Debit/Credit Card">Debit/Credit Card</SelectItem>
+        <SelectItem value="Cash">Cash</SelectItem>
       </SelectContent>
     </Select>
   )
 }
 
-export const FinancialRecordList = () => {
-  const { records, updateRecord, deleteRecord } = useFinancialRecords()
+export const FinancialRecordList = ({ records: propRecords }: FinancialRecordListProps) => {
+  const { records: contextRecords, updateRecord, deleteRecord } = useFinancialRecords()
+
+  const recordsToDisplay = propRecords ?? contextRecords
 
   const columns = useMemo(
     () => [
@@ -119,6 +125,10 @@ export const FinancialRecordList = () => {
       {
         header: "Date",
         accessorKey: "date",
+        cell: ({ getValue }: any) => {
+          const date = getValue()
+          return date ? new Date(date).toLocaleString() : ""
+        },
       },
       {
         header: "Delete",
@@ -137,12 +147,12 @@ export const FinancialRecordList = () => {
   )
 
   const table = useReactTable({
-    data: records,
+    data: recordsToDisplay,
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta: {
       updateData: (rowIndex: number, columnId: string, value: any) => {
-        const row = records[rowIndex]
+        const row = recordsToDisplay[rowIndex]
         if (!row || !row._id) return
         updateRecord(row._id, { ...row, [columnId]: value })
       },
@@ -165,15 +175,23 @@ export const FinancialRecordList = () => {
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
+          {table.getRowModel().rows.length > 0 ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="text-center py-4">
+                No records found
+              </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </div>

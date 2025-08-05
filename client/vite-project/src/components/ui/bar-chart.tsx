@@ -92,8 +92,8 @@ export function ChartBarExpenses({ records }: { records: FinancialRecord[] }) {
       const date = new Date(record.date)
       if (date.getFullYear() === year) {
         const monthIdx = date.getMonth()
-        if (monthIdx <= currentMonthIdx) {
-          months[monthIdx].expenses += record.amount
+        if (monthIdx <= currentMonthIdx && record.amount < 0) {
+          months[monthIdx].expenses += -record.amount
         }
       }
     })

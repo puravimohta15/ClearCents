@@ -29,7 +29,7 @@ import { useFinancialRecords } from "@/contexts/financial-records-context"
 const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
   amount: z.coerce.number(),
-  category: z.enum(["Food", "Rent", "Salary", "Utilities", "Entertainment", "Others"]),
+  category: z.enum(["Food", "Rent", "Salary", "Utilities", "Entertainment","Travel", "Others"]),
   paymentMethod: z.enum(["UPI", "Debit/Credit Card", "Cash"]),
 })
 

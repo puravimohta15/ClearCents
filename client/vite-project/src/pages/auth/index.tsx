@@ -3,8 +3,8 @@ import {Navigate} from "react-router-dom";
 export const Auth = () => {
     return <div className="sign-in-container">
         <SignedIn>
-            {/* <UserButton />
-            <SignOutButton /> */}
+            <UserButton />
+            <SignOutButton />
             <Navigate to="/"/>
         </SignedIn>
         <SignedOut>
