@@ -21,15 +21,11 @@ export const Dashboard = () => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
-
-  // New state for date filtering
   const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
   const [toDate, setToDate] = useState<Date | undefined>(undefined);
 
-  // State for month selection in chart
   const [selectedMonth, setSelectedMonth] = useState<Date | undefined>(undefined);
 
-  // Fetch budget for user and month
   useEffect(() => {
     if (!user?.id) return;
     const currentMonth = selectedMonth
@@ -41,7 +37,6 @@ export const Dashboard = () => {
       .then((data) => setBudget(data?.amount || 0));
   }, [user, month, selectedMonth]);
 
-  // Update budget
   const handleBudgetChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newBudget = Number(e.target.value);
     setBudget(newBudget);
@@ -61,7 +56,6 @@ export const Dashboard = () => {
     }
   };
 
-  // Calculate total spent for the selected month
   const totalMonthly = useMemo(() => {
     const currentMonth = selectedMonth
       ? `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, "0")}`
@@ -76,7 +70,6 @@ export const Dashboard = () => {
     }, 0);
   }, [records, month, selectedMonth]);
 
-  // Filtered records for list based on from and to date
   const filteredRecords = useMemo(() => {
     return records.filter((record) => {
       const recordDate = record.date ? new Date(record.date) : null;
@@ -88,6 +81,18 @@ export const Dashboard = () => {
       return true;
     });
   }, [records, fromDate, toDate]);
+
+  useEffect(() => {
+  if (!budget || budget <= 0) return;
+
+  const percentage = (totalMonthly / budget) * 100;
+
+  if (percentage >= 90) {
+    alert("🚨 You’ve reached 90% of your budget!");
+  } else if (percentage >= 80) {
+    alert("⚠️ You’ve reached 80% of your budget.");
+  }
+}, [totalMonthly, budget]);
 
   return (
     <div className="dashboard-container">

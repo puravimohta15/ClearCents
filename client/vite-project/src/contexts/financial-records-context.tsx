@@ -38,7 +38,7 @@ export const FinancialRecordsProvider = ({children}: {children: React.ReactNode}
     };
     useEffect(() => {
         fetchRecords();
-    },[user]);
+    },[user,records]);
     const addRecord = async (record: FinancialRecord) => {
         const response = await fetch("http://localhost:3000/financial-records/add", 
             {method: "POST",body: JSON.stringify(record),headers: {
